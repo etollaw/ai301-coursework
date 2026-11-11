@@ -55,10 +55,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Turned issue-select into issue-scout, wrote its search strategy, and fixed a ranking that spent my grading budget on taken issues**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I installed the scout over my Unit 1 skill and wrote three `gh search issues` queries from my fit profile, two of them naming established owners, because label-plus-language searches came back almost entirely from repos only a few weeks old. My first scan graded five issues, and four failed `unclaimed`: each already had an open PR, one filed 25 minutes after its issue, because ranking by "fewest comments, then newest" pushed hours-old issues to the top. I added `-linked:pr` to every query, and on the second scan none of the top five had a PR. Grading by hand and with the scout also exposed rubric gaps I logged but haven't patched yet: `scope-bounded` passed apache/airflow#16793 despite a maintainer's "I hope you know what you are signing up for"; `unclaimed` would pass Canner/WrenAI#1421 (I checked that one by hand) even though a maintainer said a team member was building it and the UI it targets is now a frozen legacy branch; and no check looks at an issue's age, so scikit-hep/pyhf#1653 passed after four silent years.
 
 **Unit 6: [one line on the tool work]**
 
