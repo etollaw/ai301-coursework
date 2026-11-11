@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: [FEAT]: Enable optional usage of `tox-uv` in the code and documentation testing workflows
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -9,9 +9,8 @@ files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
 **Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+**GitHub Username:** etollaw
+**Issue:** https://github.com/tektronix/python-package-ci-cd/issues/354
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -79,24 +78,18 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+My scout's two scans never surfaced this issue. They ranked apache issues on top (magpie#1824, airflow#16793), and I found tektronix/python-package-ci-cd#354 on the AI301 Issue Selection site instead, through a "test" title search after filtering for Python and good first issue / help wanted. I checked about 30 candidates there by hand with free `gh` calls, and most already had an open PR, a fresh claim, or a maintainer saying the fix had landed. Three survived, and I graded all three with the scout. It accepted all three and ranked this one the best fit: one clear goal, no assignee, no linked PR, no comments, and no AI policy against contributors like me. I re-checked on 2026-11-10 before claiming, and it was still unclaimed. I chose it because my fit profile asks for CI and testing setup work, and this is exactly that. The repo's reusable GitHub Actions workflows (`_reusable-test-code.yml`, `_reusable-test-docs.yml`) install tox with plain `pip install tox`, and the issue asks for an optional way to use `tox-uv` instead. I want to learn how reusable workflows take inputs, and how to change a workflow other projects depend on without breaking them.
+
+The scout held up on grading but fell short on search. My queries keep only issues updated since 2026-07-27, and this one was last touched in February 2025, so my own strategy filtered it out before ranking ever saw it. Its owner isn't on my owner lists either, and its title doesn't contain "CI". The rubric also passed `maintainer-active` on five renovate[bot] commits. I confirmed by hand that the maintainer who opened the issue (nfelt14) still commits, most recently on 2026-11-04. Nothing checks issue age either: this one is 21 months old and has had no comments. I logged these gaps in my scan notes but haven't patched them. My next changes would be to count only human commits in `maintainer-active`, and to drop the `--updated` cutoff in favour of ranking on creation date.
+
+Claim comment: https://github.com/tektronix/python-package-ci-cd/issues/354#issuecomment-6792472005 (posted 2026-11-11)
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout. I ran two scans with my own search strategy and rubric, then used `issue-scout: grade` on my three picks from the Issue Selection site.
+- What it produced: an accept on all six checks for #354, ranked first of my three picks as the closest fit for CI/testing work. The only caveat it flagged was that the recent commits were all from the Renovate bot.
+- Difficulties: my search strategy's `--updated` cutoff excluded this issue, so the scout found it only through grading, not scanning. `maintainer-active` counts bot commits, and no check looks at issue age.
+- What changed: I verified human maintainer activity and the unclaimed state by hand (2026-10-27 and again 2026-11-10). The rubric and strategy patches are logged in scan-notes but not made yet.
 
 ---
 
@@ -104,19 +97,23 @@ and add the link the moment your claim lands.]
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+Nothing is broken; an option is missing. python-package-ci-cd ships reusable GitHub Actions workflows that other Python projects call to run their tox test suites. Those workflows always install plain `tox` with pip, so a project that wants the faster `tox-uv` plugin (which builds tox's virtual environments with uv instead of virtualenv/pip) has no way to turn it on.
 
 **Expected Behavior**
 
-[What should happen?]
+A project calling the code-testing or docs-testing reusable workflow can opt in to `tox-uv` (for example, through a new workflow input), and the workflow then installs `tox-uv` alongside tox so its tox runs use uv. Projects that don't opt in keep today's behavior, and the workflow docs explain the new option.
 
 **Current Behavior**
 
-[What actually happens?]
+Every job installs tox with a hard-coded pip command and offers no input to change it. In `_reusable-test-code.yml`, the general job runs `python -m pip install tox tox-gh-actions` and the fast job runs `python -m pip install tox`. In `_reusable-test-docs.yml`, the job runs `python -m pip install tox`. Neither workflow's `inputs:` block has anything about uv or tox-uv.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+- `.github/workflows/_reusable-test-code.yml`: the reusable code-testing workflow (its inputs and its install steps)
+- `.github/workflows/_reusable-test-docs.yml`: the reusable docs-testing workflow
+- `workflows/test-code.md` and `workflows/test-docs.md`: the user docs for those workflows, including their Inputs sections
+- `.github/workflows/test-code.yml` and `test-docs.yml`: this repo's own callers, where the new option can be exercised
+- `CHANGELOG.md`: its Unreleased section (CONTRIBUTING.md requires an entry)
 
 **Toolkit**
 
