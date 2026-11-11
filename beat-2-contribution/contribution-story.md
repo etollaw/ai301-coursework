@@ -146,7 +146,7 @@ Every job installs tox with a hard-coded pip command and offers no input to chan
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** fork not created yet (pending)
+- **Commit showing reproduction:** https://github.com/etollaw/python-package-ci-cd/commit/2774f9f38d6b79125ac6538b134bc73cfbce1d4b (branch `repro/354-tox-uv` on my fork: adds `tox-uv` to both install steps in `_reusable-test-code.yml`). Its CI run, https://github.com/etollaw/python-package-ci-cd/actions/runs/42998863934, failed in all 6 test jobs (test-fast and test-general on ubuntu, macos, windows) with `.tox/tests/bin/python: No module named pip` / `tests: FAIL code 1`, the same failure I got locally.
 - **Screenshots/logs:** full logs and a summary are in my local evidence file (`~/tektronix-354-repro/evidence.txt`, plus `run*.log` for each run). Timings for the `tests` env: current setup 49.8 s with cold caches, then 17.2 s with warm caches; tox-uv + `uv_seed` 18.0 s with warm caches.
 - **My findings:** The missing option reproduces: the workflows give no way to use tox-uv. The bigger finding is that just adding `tox-uv` to the install step breaks a project like this one. The repo's own tox config sets `install_command = python -I -m pip install ...`, and venvs created by tox-uv don't include pip unless `uv_seed = true`. With seeding, the tests pass, but I measured no speedup on this repo (18.0 s vs 17.2 s): installs still go through pip and Poetry, so uv only creates the venv. So the opt-in needs to be documented with this caveat, or the workflow has to handle seeding. Before writing the plan, I want to ask the maintainer which they prefer.
 
@@ -213,6 +213,10 @@ built, decisions you made when you made them, wrong turns included.]
 **2026-11-11**
 
 Posted my claim on #354 and started the reproduction. I mirrored the workflow's install step in fresh venvs with and without `tox-uv` and ran the repo's `tests` env with each. Wrong turn: my first runs used Python 3.14, which the project rejects, so I installed 3.13 with uv. Finding: `tox-uv` alone fails on this repo with "No module named pip", because the repo's tox config forces pip as the install command. `uv_seed = true` fixes that, but it gave no speedup here (18.0 s vs 17.2 s warm). Decision: don't write the plan until I've asked the maintainer whether the opt-in should handle seeding or just document it.
+
+**2026-11-11 (later)**
+
+Tested how a workflow could turn seeding on without editing a project's tox config. `TOX_UV_SEED=true` does nothing (no `--seed`, still "No module named pip"). `TOX_OVERRIDE=testenv.uv_seed=true` works, and the tests pass. I posted this to the maintainer and asked whether the input should enable seeding or just document the caveat: https://github.com/tektronix/python-package-ci-cd/issues/354#issuecomment-6792674016. I also forked the repo and pushed a repro branch. On GitHub runners it fails in all 6 test jobs, on all three operating systems, with the same "No module named pip" error.
 
 **Toolkit**
 
