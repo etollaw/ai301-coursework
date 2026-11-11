@@ -8,7 +8,7 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
+**Student:** Eldad Tolla
 **GitHub Username:** etollaw
 **Issue:** https://github.com/tektronix/python-package-ci-cd/issues/354
 **Pull Request:** [GitHub PR link, once opened]
@@ -128,24 +128,27 @@ Every job installs tox with a hard-coded pip command and offers no input to chan
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+- macOS 26.5.1 (Apple silicon). tektronix/python-package-ci-cd cloned at `7d896b9` (main, 2026-11-11).
+- Python 3.13.18, installed with `uv python install 3.13`, because the project requires `~=3.13.0`. My system Python is 3.14.7.
+- tox 4.67.13, tox-gh-actions 3.5.0, and tox-uv 1.37.7 (uv 0.13.7), each in a fresh venv outside the repo. These mirror the workflow's install step: `python -m pip install tox tox-gh-actions` for the current setup, plus `tox-uv` for the opt-in setup.
+- I ran the repo's `tests` env with `tox -ve tests`, the same command the workflow's fast job uses, giving each run its own `--workdir` so runs didn't share environments.
+- Challenges:
+  - My first runs used Python 3.14 and Poetry refused it ("Current Python version (3.14.7) is not allowed by the project (~=3.13.0)"). I fixed that by installing 3.13.
+  - Under tox-uv, the venv still came out as 3.14 even with 3.13 first on PATH. The `tests` env sets `basepython = python`: plain tox uses the interpreter tox runs on, but tox-uv searches for one and found 3.14. Pinning `basepython=python3.13` fixed it locally. On GitHub runners, setup-python installs only the matrix version, so this is likely local-only.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. Read the install steps on main: `_reusable-test-code.yml` runs `python -m pip install tox tox-gh-actions` (line 72) and `python -m pip install tox` (line 116); `_reusable-test-docs.yml` runs `python -m pip install tox` (line 52). Neither workflow's `inputs:` mentions uv.
+2. In a fresh Python 3.13 venv, run that exact install step, then `tox --version`. Registered plugins: only `tox-gh-actions-3.5.0`.
+3. Run `tox -ve tests` from the repo. The log shows `create virtual environment via CPython3Posix` (virtualenv, not uv). Result: `31 passed, 2 deselected`, `tests: OK`.
+4. Repeat steps 2–3 with `tox-uv` added to the install, which is what the issue asks for. `tox --version` now lists `tox-uv-bare-1.37.7 ... with uv==0.13.7`, and the venv is created by `uv venv`. The run then fails at once: `.tox-B/tests/bin/python: No module named pip`, `tests: FAIL code 1`.
+5. Re-run step 4 with `-x testenv.uv_seed=true` (plus `basepython=python3.13`, see setup). Result: `31 passed, 2 deselected`, `tests: OK`.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** fork not created yet (pending)
+- **Screenshots/logs:** full logs and a summary are in my local evidence file (`~/tektronix-354-repro/evidence.txt`, plus `run*.log` for each run). Timings for the `tests` env: current setup 49.8 s with cold caches, then 17.2 s with warm caches; tox-uv + `uv_seed` 18.0 s with warm caches.
+- **My findings:** The missing option reproduces: the workflows give no way to use tox-uv. The bigger finding is that just adding `tox-uv` to the install step breaks a project like this one. The repo's own tox config sets `install_command = python -I -m pip install ...`, and venvs created by tox-uv don't include pip unless `uv_seed = true`. With seeding, the tests pass, but I measured no speedup on this repo (18.0 s vs 17.2 s): installs still go through pip and Poetry, so uv only creates the venv. So the opt-in needs to be documented with this caveat, or the workflow has to handle seeding. Before writing the plan, I want to ask the maintainer which they prefer.
 
 **Toolkit**
 
@@ -207,13 +210,9 @@ observable named is not a strategy.]
 [A running log, added to as you work. Date each entry. What you
 built, decisions you made when you made them, wrong turns included.]
 
-**[Date]**
+**2026-11-11**
 
-[Entry]
-
-**[Date]**
-
-[Entry]
+Posted my claim on #354 and started the reproduction. I mirrored the workflow's install step in fresh venvs with and without `tox-uv` and ran the repo's `tests` env with each. Wrong turn: my first runs used Python 3.14, which the project rejects, so I installed 3.13 with uv. Finding: `tox-uv` alone fails on this repo with "No module named pip", because the repo's tox config forces pip as the install command. `uv_seed = true` fixes that, but it gave no speedup here (18.0 s vs 17.2 s warm). Decision: don't write the plan until I've asked the maintainer whether the opt-in should handle seeding or just document it.
 
 **Toolkit**
 
