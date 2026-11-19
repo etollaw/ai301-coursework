@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Eldad Tolla
 **GitHub Username:** etollaw
 **Issue:** https://github.com/tektronix/python-package-ci-cd/issues/354
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** https://github.com/tektronix/python-package-ci-cd/pull/1329
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -233,13 +233,13 @@ Built the change on `feat/354-optional-tox-uv`, rebased on upstream main, and ma
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/tektronix/python-package-ci-cd/pull/1329
 
 **PR Description:** Title: "feat: add optional use-tox-uv input to the testing workflows". It follows the repo's PR template. Proposed changes covers the input, the documented `install_command` caveat, and removing the override, as agreed on #354, with `Addresses #354` and one bullet per changed file. It also says why the README is unchanged, and records the `known_words.txt` deviation. Testing pastes the before/after output (`No module named pip` on main with tox-uv; `31 passed` on the branch with and without tox-uv; docs and doctests OK; pre-commit exit 0) and links the fork CI run, then names what runs only in CI. It ends with an AI disclosure saying I used Claude Code to reproduce, edit, run checks and draft, and that I reviewed the diff and output. The CLA and "commented my code" boxes stay unticked, each with a reason.
 
 **Maintainer Feedback:**
 
-- 2026-11-18: none yet (PR opened today)
+- 2026-11-19: none yet. PR opened; CodeFactor and pre-commit.ci passed, and the test workflows are waiting for a maintainer to approve them, as they do for a first-time contributor's PR.
 
 **Status:** Awaiting review
 
@@ -247,8 +247,8 @@ Built the change on `feat/354-optional-tox-uv`, rebased on upstream main, and ma
 
 - Tool: the ship-gate (Unit 7) before the PR, and the voice guard (Unit 6) on the description
 - What it produced: ship-gate PASS on the second run; voice guard "pass. Your rules hold; you can post it." on pr_draft.md
-- Difficulties: the first gate run rejected the branch (stale main, missing README reason). Opening the PR through Claude Code was blocked by Claude Code's auto-mode safety check, so the hooks didn't check the final `gh pr create`
-- What changed: fixed both gate findings, then opened the PR myself with the exact body file the gate and guard had passed
+- Difficulties: the first gate run rejected the branch (stale main, missing README reason). Opening the PR through Claude Code was blocked by Claude Code's auto-mode safety check, so I opened it from a fresh Claude Code session where both hooks were active. That session's first attempt was stopped by the ship-gate because it passed the body file as an unexpanded shell variable; it reran with the full path and the gate let it through. It also appended a "Generated with Claude Code" line to the body, which I removed with `gh pr edit` because my disclosure was already in the description
+- What changed: fixed both gate findings before opening; restored the PR body to the exact file the gate and voice guard had passed
 
 ---
 
