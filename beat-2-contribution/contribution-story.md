@@ -235,11 +235,11 @@ Built the change on `feat/354-optional-tox-uv`, rebased on upstream main, and ma
 
 **PR Link:** https://github.com/tektronix/python-package-ci-cd/pull/1329
 
-**PR Description:** Title: "feat: add optional use-tox-uv input to the testing workflows". It follows the repo's PR template. Proposed changes covers the input, the documented `install_command` caveat, and removing the override, as agreed on #354, with `Addresses #354` and one bullet per changed file. It also says why the README is unchanged, and records the `known_words.txt` deviation. Testing pastes the before/after output (`No module named pip` on main with tox-uv; `31 passed` on the branch with and without tox-uv; docs and doctests OK; pre-commit exit 0) and links the fork CI run, then names what runs only in CI. It ends with an AI disclosure saying I used Claude Code to reproduce, edit, run checks and draft, and that I reviewed the diff and output. The CLA and "commented my code" boxes stay unticked, each with a reason.
+**PR Description:** Title: "feat: add optional use-tox-uv input to the testing workflows". It follows the repo's PR template. Proposed changes covers the input, the documented `install_command` caveat, and removing the override, as agreed on #354, with `Addresses #354` and one bullet per changed file. It also says why the README is unchanged, and records the `known_words.txt` deviation. Testing pastes the before/after output (`No module named pip` on main with tox-uv; `31 passed` on the branch with and without tox-uv; docs and doctests OK; pre-commit exit 0) and links the fork CI run, then names what runs only in CI. It ends with an AI disclosure saying I used Claude Code to reproduce, edit, run checks and draft, and that I reviewed the diff and output. The "commented my code" box stays unticked, with a reason. The CLA box was unticked at first because I couldn't find a CLA in the repo. After the CLA assistant bot asked on the PR, I signed it on 2026-11-19 and ticked the box.
 
 **Maintainer Feedback:**
 
-- 2026-11-19: none yet. PR opened; CodeFactor and pre-commit.ci passed, and the test workflows are waiting for a maintainer to approve them, as they do for a first-time contributor's PR.
+- 2026-11-19: no maintainer feedback yet. The CLA assistant bot asked me to sign tektronix's Contributor License Agreement; I signed it the same day, its badge shows signed, and I ticked the CLA box in the description. PR opened; CodeFactor and pre-commit.ci passed, and the test workflows are waiting for a maintainer to approve them, as they do for a first-time contributor's PR.
 
 **Status:** Awaiting review
 
